@@ -1,0 +1,30 @@
+gather_orc_archives:
+  source_path: /DINO_ROOT
+splunk:
+  index: myindex
+hives:
+  sam:
+    enabled: false
+  user:
+    enabled: false
+  system:
+    enabled: false
+ntfs:
+  i30:
+    enabled: false
+  info:
+    enabled: false
+  pehash:
+    enabled: false
+  secdescr:
+    enabled: false
+usn:
+  enabled: false
+mft:
+  enabled: false
+evtx:
+  enabled: false
+autoruns:
+  enabled: false
+tcpvcon:
+  enabled: false

@@ -7,6 +7,7 @@ from dagster import Field, get_dagster_logger, op
 
 from dino import layout_manager
 from dino.models.file import FileModel
+from dino.utils.filesystem import get_file_informations
 
 
 def decompress_7z(filepath: Path, passwords: List[str] = []):
@@ -46,16 +47,17 @@ def decompress_7z(filepath: Path, passwords: List[str] = []):
         ),
     },
 )
-def decompress_file(context, file: FileModel) -> Path:
+def decompress_file(context, file: Path) -> Path:
     logger = get_dagster_logger()
     mapping = {
         "7-zip archive data": decompress_7z,
     }
+    file_info = get_file_informations(file)
     for algo, decompress_method in mapping.items():
-        if algo in file.magic:
+        if algo in file_info.magic:
             logger.info(
-                f"Decompress {file.path} using method `{decompress_method.__name__}`"
+                f"Decompress {file_info.path} using method `{decompress_method.__name__}`"
             )
-            return decompress_method(file.path, context.op_config["passwords"])
-    logger.critical(f"Could not decompress file {file}")
-    raise ValueError(f"Could not decompress file {file}")
+            return decompress_method(file_info.path, context.op_config["passwords"])
+    logger.critical(f"Could not decompress file {file_info}")
+    raise ValueError(f"Could not decompress file {file_info}")

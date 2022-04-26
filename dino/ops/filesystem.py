@@ -1,9 +1,9 @@
 import re
 from pathlib import Path
-from typing import Iterator, List
+from typing import Iterator, List, Optional
 from uuid import uuid4
 
-from dagster import (DynamicOut, DynamicOutput, Field, Out, get_dagster_logger,
+from dagster import (DynamicOut, DynamicOutput, Field, Out, get_dagster_logger, Output,
                      op)
 
 from dino.models.file import FileModel
@@ -25,9 +25,9 @@ from dino.utils.filesystem import get_file_informations
             default_value=".*",
         ),
     },
-    out=DynamicOut(FileModel),
+    out=DynamicOut(Path),
 )
-def gather_files(context) -> Iterator[FileModel]:
+def gather_files(context) -> Iterator[Path]:
     """Gather files from a given path."""
     logger = get_dagster_logger()
 
@@ -71,7 +71,7 @@ def gather_files(context) -> Iterator[FileModel]:
             )
             continue
         logger.info(f"Found file {entry}")
-        yield DynamicOutput(value=file_info, mapping_key=uuid4().hex)
+        yield DynamicOutput(value=entry, mapping_key=uuid4().hex)
 
 
 @op(
@@ -85,14 +85,14 @@ def gather_files(context) -> Iterator[FileModel]:
             default_value=False,
         ),
     },
-    out=Out(FileModel, is_required=False),
+    out={"file": Out(Path, is_required=False)},
 )
 def find_file(context, folder: Path):
     """Find a file in a given folder."""
     logger = get_dagster_logger()
     if context.op_config["skip"]:
         logger.info(f"Skipping execution of find_file for {folder}")
-        return None
+        return
     logger.debug(
         f"Searching for a file {context.op_config['file_names_patterns']} in {folder})"
     )
@@ -101,7 +101,9 @@ def find_file(context, folder: Path):
         potential_file = folder / filename
         if potential_file.is_file():
             logger.info(f"Found file {potential_file}")
-            return get_file_informations(potential_file)
+            yield Output(potential_file, "file")
+            return
+            #return get_file_informations(potential_file)
 
     logger.critical(
         f"Could not find one of {context.op_config['file_names_patterns']} from {folder}"

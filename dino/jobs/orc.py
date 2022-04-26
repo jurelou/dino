@@ -5,6 +5,8 @@ from dino.ops.artifacts.evtx import process_evtx
 from dino.ops.artifacts.mft import process_mft
 from dino.ops.artifacts.registry import process_registry
 from dino.ops.artifacts.zircolite import process_zircolite
+from dino.ops.artifacts.tcpvcon import process_tcpvcon
+
 from dino.ops.decompress import decompress_file
 from dino.ops.filesystem import find_file, gather_files
 from dino.ops.splunk import send_csv_files, send_json_file
@@ -17,6 +19,15 @@ def orc():
     """Parse orc files."""
     gather_orc_archives = gather_files.alias("gather_orc_archives")
     orc_archives = gather_orc_archives().map(decompress_file)
+
+    ###########################################################################################
+    # TCPVCON
+    ###########################################################################################
+    # CONFIGURE ops
+    tcpvcon_find_file = find_file.alias("tcpvcon_find_file")
+
+    # RUN pipeline
+    orc_archives.map(tcpvcon_find_file).map(process_tcpvcon)
 
     ###########################################################################################
     # MFT
@@ -126,7 +137,7 @@ def orc():
     def ntfs_pehash_send_files(config):
         return {
             "file_names_patterns": config["file_names_patterns"],
-            "source": "ntfs-pehash",
+            "source": "ntfs_pehash",
             # "encoding": "utf-8",
             "sourcetype": "dino:ntfs/json",
         }
@@ -149,7 +160,7 @@ def orc():
     def ntfs_secdescr_send_files(config):
         return {
             "file_names_patterns": config["file_names_patterns"],
-            "source": "ntfs-secdescr",
+            "source": "ntfs_secdescr",
             # "encoding": "utf-8",
             "sourcetype": "dino/json",
         }
@@ -170,7 +181,7 @@ def orc():
     def ntfs_i30_send_files(config):
         return {
             "file_names_patterns": config["file_names_patterns"],
-            "source": "ntfs-i30",
+            "source": "ntfs_i30",
             # "encoding": "utf-8",
             "sourcetype": "dino:ntfs:i30/json",
         }
@@ -203,10 +214,11 @@ def orc():
     # Autoruns
     ###########################################################################################
     # CONFIGURE ops
-    @configured(send_csv_files, config_schema={"file_names_patterns": [str]})
+    @configured(send_csv_files, config_schema={"file_names_patterns": [str], "skip": bool})
     def autoruns_send_files(config):
         return {
             "file_names_patterns": config["file_names_patterns"],
+            "skip": config["skip"],
             "source": "autoruns",
             "encoding": "utf-16",
             "sourcetype": "dino:autoruns/json",

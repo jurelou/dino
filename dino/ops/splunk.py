@@ -19,11 +19,18 @@ from dino.utils.splunk import SplunkHEC
         "encoding": Field(
             str, description="Encoding of the file", default_value="utf-8"
         ),
+        "skip": Field(
+            bool,
+            description="Whether or not to skip execution of this op",
+            default_value=False,
+        ),
     },
 )
 def send_csv_files(context, folder: Path):
     logger = get_dagster_logger()
-
+    if context.op_config["skip"]:
+        logger.info(f"Skipping execution of send_csv_files for {folder}")
+        return
     logger.debug(
         f"Sending csv files matching `{context.op_config['file_names_patterns']}` from `{folder}`"
     )

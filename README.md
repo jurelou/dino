@@ -64,9 +64,9 @@ You can start launching jobs via dagit!
 |evtx - sigma rules | :heavy_check_mark: | zircolite |
 |Autoruns | :heavy_check_mark: | autoruns |
 |ntfs | :heavy_check_mark: | ntfs |
-|ntfs $i30 | :heavy_check_mark: | ntfs-i30 |
-|ntfs pehash | :heavy_check_mark: | ntfs-pehash |
-|ntfs secdescr | :heavy_check_mark: | ntfs-secdescr|
+|ntfs $i30 | :heavy_check_mark: | ntfs_i30 |
+|ntfs pehash | :heavy_check_mark: | ntfs_pehash |
+|ntfs secdescr | :heavy_check_mark: | ntfs_secdescr|
 |usn | :heavy_check_mark: | usn |
 |mft | :heavy_check_mark: | mft |
 |SAM hives | :heavy_check_mark: | sam_hives |
@@ -74,7 +74,7 @@ You can start launching jobs via dagit!
 |System hives | :heavy_check_mark: | system_hives |
 |RAM | :x: | :x:|
 |TextLogs | :x: | :x:|
-|tcpvcon | :x: | :x:|
+|tcpvcon | :heavy_check_mark: | tcpvcon |
 |PsService | :x: | :x:|
 |tcpvcon | :x: | :x:|
 |Listdlls | :x: | :x:|
