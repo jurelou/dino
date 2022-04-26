@@ -58,20 +58,20 @@ You can start launching jobs via dagit!
 ```
 # Supported DFIR-ORC artifacts
 
-|Artifact name | parsing | splunk sourcetype|
+|Artifact name | parsing | splunk `source` |
 |--|--|--|
-|evtx | :heavy_check_mark: | :heavy_check_mark:|
-|evtx - sigma rules | :heavy_check_mark: | :heavy_check_mark:|
-|Autoruns | :heavy_check_mark: | :heavy_check_mark:|
-|ntfs | :heavy_check_mark: | :heavy_check_mark:|
-|ntfs $i30 | :heavy_check_mark: | :heavy_check_mark:|
-|ntfs pehash | :heavy_check_mark: | :heavy_check_mark:|
-|ntfs secdescr | :heavy_check_mark: | :heavy_check_mark:|
-|usn | :heavy_check_mark: | :heavy_check_mark:|
-|mft | :heavy_check_mark: | :heavy_check_mark:|
-|SAM hives | :heavy_check_mark: | :heavy_check_mark:|
-|User hives | :heavy_check_mark: | :heavy_check_mark:|
-|System hives | :heavy_check_mark: | :heavy_check_mark:|
+|evtx | :heavy_check_mark: | evtx |
+|evtx - sigma rules | :heavy_check_mark: | zircolite |
+|Autoruns | :heavy_check_mark: | autoruns |
+|ntfs | :heavy_check_mark: | ntfs |
+|ntfs $i30 | :heavy_check_mark: | ntfs-i30 |
+|ntfs pehash | :heavy_check_mark: | ntfs-pehash |
+|ntfs secdescr | :heavy_check_mark: | ntfs-secdescr|
+|usn | :heavy_check_mark: | usn |
+|mft | :heavy_check_mark: | mft |
+|SAM hives | :heavy_check_mark: | sam_hives |
+|User hives | :heavy_check_mark: | user_hives |
+|System hives | :heavy_check_mark: | system_hives |
 |RAM | :x: | :x:|
 |TextLogs | :x: | :x:|
 |tcpvcon | :x: | :x:|
@@ -91,7 +91,8 @@ You can start launching jobs via dagit!
 # Known bugs
 
 - CRC32 errors while trying to unzip ORCs
-
+- When converting csv to json, some keys have quotes, (eg. "ComputerName")
+- 
 # TODO
 
 - csv files: remove empty values
