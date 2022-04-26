@@ -28,3 +28,5 @@ autoruns:
   enabled: false
 tcpvcon:
   enabled: false
+psservice:
+  enabled: false

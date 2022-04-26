@@ -6,6 +6,7 @@ from dino.ops.artifacts.mft import process_mft
 from dino.ops.artifacts.registry import process_registry
 from dino.ops.artifacts.zircolite import process_zircolite
 from dino.ops.artifacts.tcpvcon import process_tcpvcon
+from dino.ops.artifacts.psservice import process_psservice
 
 from dino.ops.decompress import decompress_file
 from dino.ops.filesystem import find_file, gather_files
@@ -19,6 +20,15 @@ def orc():
     """Parse orc files."""
     gather_orc_archives = gather_files.alias("gather_orc_archives")
     orc_archives = gather_orc_archives().map(decompress_file)
+
+    ###########################################################################################
+    # PSSERVICE
+    ###########################################################################################
+    # CONFIGURE ops
+    psservice_find_file = find_file.alias("psservice_find_file")
+
+    # RUN pipeline
+    orc_archives.map(psservice_find_file).map(process_psservice)
 
     ###########################################################################################
     # TCPVCON

@@ -75,7 +75,7 @@ You can start launching jobs via dagit!
 |RAM | :x: | :x:|
 |TextLogs | :x: | :x:|
 |tcpvcon | :heavy_check_mark: | tcpvcon |
-|PsService | :x: | :x:|
+|PsService | :heavy_check_mark: | psservice |
 |tcpvcon | :x: | :x:|
 |Listdlls | :x: | :x:|
 |GetSamples* | :x: | :x:|

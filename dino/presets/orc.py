@@ -78,6 +78,10 @@ from dagster import Field, config_mapping
         "tcpvcon": {
             "file_names_patterns": Field([str], description="File pattern matching tcpvcon file", default_value=["Tcpvcon.txt", "tcpvcon.txt"]),
             "enabled": Field(bool, description="Whether or not to activate this module", default_value=True),
+        },
+        "psservice": {
+            "file_names_patterns": Field([str], description="File pattern matching psservice file", default_value=["PsService.txt"]),
+            "enabled": Field(bool, description="Whether or not to activate this module", default_value=True),
         }
     }
 )
@@ -214,6 +218,12 @@ def orc_preset(val):
                 "config": {
                     "file_names_patterns": val["tcpvcon"]["file_names_patterns"],
                     "skip": not val["tcpvcon"]["enabled"]
+                }
+            },
+            "psservice_find_file": {
+                "config": {
+                    "file_names_patterns": val["psservice"]["file_names_patterns"],
+                    "skip": not val["psservice"]["enabled"]
                 }
             }
         }
