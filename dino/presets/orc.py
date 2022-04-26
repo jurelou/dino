@@ -99,7 +99,6 @@ def orc_preset(val):
                     "file_extension": val["zircolite"]["files_extension"]
                 }
             },
-
             "evtx_find_archive": {
                 "config": {
                     "file_names_patterns": val["evtx"]["archive_name_patterns"]

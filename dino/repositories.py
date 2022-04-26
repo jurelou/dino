@@ -1,9 +1,9 @@
 from dagster import repository
 
 from dino.jobs.orc import orc
-
+from dino.jobs.evtx import evtx
 
 @repository
-def repo_a():
-    """Repo A."""
-    return [orc]
+def main_repository():
+    """main repository."""
+    return [orc, evtx]

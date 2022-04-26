@@ -17,12 +17,12 @@ from dino.utils.filesystem import get_file_informations
             bool, description="Whether or not to recurse subfolders", default_value=True
         ),
         "file_magic": Field(
-            str, description="Find files of a given type", default_value="*"
+            str, description="Find files of a given type", default_value=".*"
         ),
         "file_name_regex": Field(
             str,
             description="Find filenames matching a specific pattern",
-            default_value="*",
+            default_value=".*",
         ),
     },
     out=DynamicOut(FileModel),
@@ -45,8 +45,8 @@ def gather_files(context) -> Iterator[FileModel]:
             entries = path.glob("*")
 
     file_pattern_matching = re.compile(context.op_config["file_name_regex"])
-    check_file_pattern = context.op_config["file_name_regex"] != "*"
-    check_file_magic = context.op_config["file_magic"] != "*"
+    check_file_pattern = context.op_config["file_name_regex"] != ".*"
+    check_file_magic = context.op_config["file_magic"] != ".*"
 
     for entry in entries:
         entry_absolute_str = str(entry.absolute())

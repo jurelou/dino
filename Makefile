@@ -1,16 +1,17 @@
-
+include .env
 # all:
 # 	docker-compose up -d --build
 
 all:
+	mkdir -p ${ROOT_FOLDER} || true
 	docker-compose -f docker-compose-dev.yml up -d --build
 
 stop:
 	docker-compose -f docker-compose-dev.yml down -v
 
 rm:
-	sudo rm -rf /data/dino_root/DINO_SPLUNK_UNIVERSAL_FORWARDER
-	sudo rm -rf /data/dino_root/__DINO_TEMP
+	sudo rm -rf ${ROOT_FOLDER}/DINO_SPLUNK_UNIVERSAL_FORWARDER
+	sudo rm -rf ${ROOT_FOLDER}/__DINO_TEMP
 
 setup:
 	git submodule update --init
@@ -24,4 +25,4 @@ setup:
 re: stop all
 
 format:
-	tox
+	@tox

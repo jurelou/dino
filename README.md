@@ -21,6 +21,12 @@
 
 # Installation
 
+Clone the repository (including sub modules) with:
+```
+git clone --recurse-submodules https://github.com/jurelou/dino
+cd dino
+```
+
 If necessary, modify `ROOT_FOLDER` in the `.env` file. This is the folder containing your artifacts to analyze.
 Then, run:
 ```
