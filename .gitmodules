@@ -1,0 +1,3 @@
+[submodule "external_tools/Zircolite"]
+	path = external_tools/Zircolite
+	url = https://github.com/wagga40/Zircolite

@@ -1,0 +1,56 @@
+---
+volumes:
+  dagster-postgres:
+    driver: local
+
+x-common: &x-common
+  restart: unless-stopped
+
+services:
+  splunk:
+    <<: *x-common
+    container_name: splunk
+    build:
+      context: ./docker/splunk
+    environment:
+      SPLUNK_PASSWORD: password
+      SPLUNK_START_ARGS: --accept-license
+    ports:
+      - 8000:8000
+      # - 9997:9997
+      - 8088:8088
+      - 8089:8089
+
+  dagster-dagit:
+    <<: *x-common
+    container_name: dagit
+    build:
+      context: .
+      dockerfile: ./docker/dagster/dev/Dockerfile
+    ports:
+      - 3000:3000
+
+  dagster-daemon:
+    <<: *x-common
+    container_name: dagster
+    build: 
+      context: .
+      dockerfile: ./docker/dagster/dev/Dockerfile
+    command: "dagster-daemon run"
+    environment:
+      DYNACONF_ROOT_FOLDER: /DINO_ROOT
+    volumes:
+      - ./dino:/opt/dino/dino
+      - ./settings.yaml:/opt/dino/settings.yaml
+      - ${ROOT_FOLDER}:/DINO_ROOT
+
+  dagster-postgres:
+    <<: *x-common
+    container_name: postgres
+    image: postgres:13.3
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - dagster-postgres:/var/lib/postgresql/data

@@ -1,0 +1,91 @@
+version: "3.7"
+
+volumes:
+  postgres:
+    driver: local
+
+networks:
+  dino:
+    driver: bridge
+    name: dino
+
+x-common: &x-common
+  restart: unless-stopped
+  networks:
+    - dino
+
+services:
+  dino:
+    <<: *x-common
+    build:
+      context: .
+      dockerfile: ./docker/dagster/prod/Dockerfile
+    container_name: dino
+    image: dino
+    environment:
+      DAGSTER_POSTGRES_USER: "postgres_user"
+      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
+      DAGSTER_POSTGRES_DB: "postgres_db"
+    volumes:
+      - ./dino:/opt/dino/dino:ro
+      - ./docker/dagster/prod/workspace.yaml:/opt/dino/workspace.yaml:ro
+    volumes:
+      - /data/dino_root/:/DINO_ROOT
+
+  postgresql:
+    <<: *x-common
+    image: postgres:14.2-alpine3.15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: "postgres_user"
+      POSTGRES_PASSWORD: "postgres_password"
+      POSTGRES_DB: "postgres_db"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  dagit:
+    <<: *x-common
+    build:
+      context: .
+      dockerfile: ./docker/dagster/prod/Dockerfile
+    entrypoint:
+      - dagit
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "3000"
+      - -w
+      - workspace.yaml
+    container_name: dagit
+    ports:
+      - "3000:3000"
+    environment:
+      DAGSTER_POSTGRES_USER: "postgres_user"
+      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
+      DAGSTER_POSTGRES_DB: "postgres_db"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - dino
+      - postgresql
+
+  daemon:
+    <<: *x-common
+    build:
+      context: .
+      dockerfile: ./docker/dagster/prod/Dockerfile
+    container_name: daemon
+    entrypoint:
+      - dagster-daemon
+      - run
+    environment:
+      DAGSTER_POSTGRES_USER: "postgres_user"
+      DAGSTER_POSTGRES_PASSWORD: "postgres_password"
+      DAGSTER_POSTGRES_DB: "postgres_db"
+    depends_on:
+      - dino
+      - postgresql
+
+  # rabbitmq:
+  #   <<: *x-common
+  #   image: rabbitmq:3.10.0-rc.3-alpine

@@ -1,0 +1,52 @@
+ansible_connection: local
+ansible_environment: {}
+ansible_post_tasks: []
+ansible_pre_tasks: []
+cert_prefix: https
+config:
+  baked: default.yml
+  defaults_dir: /tmp/defaults
+dmc_asset_interval: '3,18,33,48 * * * *'
+dmc_forwarder_monitoring: false
+docker: true
+splunk:
+  admin_user: dino
+  allow_upgrade: true
+  app_paths:
+    default: /opt/splunk/etc/apps
+    deployment: /opt/splunk/etc/deployment-apps
+    httpinput: /opt/splunk/etc/apps/splunk_httpinput
+    idxc: /opt/splunk/etc/master-apps
+    shc: /opt/splunk/etc/shcluster/apps
+
+  conf:
+    - key: app
+      value:
+        directory: /opt/splunk/etc/apps/dino-splunk/local
+        content:
+          ui:
+            is_visible: 0
+            label: DINO Splunk
+          launcher:
+            author: jurelou
+            description: Self-contained app for dino.
+            version: 0.1.0
+          package:
+            check_for_updates: 0
+    - key: ui-tour
+      value:
+        directory: /opt/splunk/etc/apps/dino-splunk/local
+        content:
+          search-tour:
+            viewed: 1
+    - key: web
+      value:
+        directory: /opt/splunk/etc/apps/dino-splunk/local
+        content:
+          settings:
+            login_content: >-
+              Custom splunk instance for dino. Default creds are <tt>dino:password</tt>.
+            loginBackgroundImageOption: custom
+            loginFooterOption: custom
+            loginFooterText: 'https://github.com/jurelou/dino'
+            loginPasswordHint: dino:password
