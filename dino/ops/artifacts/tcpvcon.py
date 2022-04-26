@@ -12,8 +12,8 @@ def process_tcpvcon(context, file: Path):
     logger = get_dagster_logger()
     logger.info(f"Process tcpvcon file {file}")
 
-    with open(file) as f:
-        data = f.read()
+    with open(file, mode="rb") as f:
+        data = f.read().decode("ISO-8859-1")
 
     with context.resources.splunk.stream(
         sourcetype="dino/json",

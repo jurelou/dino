@@ -30,3 +30,5 @@ tcpvcon:
   enabled: false
 psservice:
   enabled: false
+listdlls:
+  enabled: false

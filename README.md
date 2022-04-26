@@ -77,16 +77,17 @@ You can start launching jobs via dagit!
 |tcpvcon | :heavy_check_mark: | tcpvcon |
 |PsService | :heavy_check_mark: | psservice |
 |tcpvcon | :x: | :x:|
-|Listdlls | :x: | :x:|
-|GetSamples* | :x: | :x:|
+|Listdlls | :heavy_check_mark: | listdlls |
 |AuditTool | :x: | :x:|
 |CatRoot | :x: | :x:|
 |Browsers history | :x: | :x:|
 |bootcode | :x: | :x:|
-|Artefacts | :x: | :x:|
 |ARKUser | :x: | :x:|
 |ADS | :x: | :x:|
-|files - yara rules | :x: | :x:|
+|files (GetSamples, Artefacts, ...) - yara rules | :x: | :x:|
+|All GetThis.csv | :x: | :x:|
+|ProcessStatistics.csv | :x: | :x:|
+
 
 # Known bugs
 
