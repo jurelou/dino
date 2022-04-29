@@ -1,5 +1,6 @@
 import csv
 from pathlib import Path
+import sys
 
 import ujson
 from dagster import Field, get_dagster_logger, op
@@ -7,6 +8,13 @@ from dagster import Field, get_dagster_logger, op
 from dino.utils.filesystem import find_files_matching_patterns
 from dino.utils.splunk import SplunkHEC
 
+# ugly patch for : _csv.Error: field larger than field limit (131072)
+# see: https://stackoverflow.com/questions/15063936/csv-error-field-larger-than-field-limit-131072
+csv.field_size_limit(sys.maxsize)
+
+def _fix_nul_bytes(f):
+    for line in f.readlines():
+        yield line.replace('\0', '')
 
 @op(
     required_resource_keys={"splunk"},
@@ -44,7 +52,7 @@ def send_csv_files(context, folder: Path):
             sourcetype=context.op_config["sourcetype"],
         ) as hec:
             with open(file, encoding=context.op_config["encoding"]) as csv_file:
-                csv_reader = csv.DictReader(csv_file)
+                csv_reader = csv.DictReader(_fix_nul_bytes(csv_file))
                 for row in csv_reader:
                     hec.send_dict(row)
                     # TODO: remove empty key/values

@@ -41,6 +41,7 @@ services:
       DYNACONF_ROOT_FOLDER: /DINO_ROOT
     volumes:
       - ./dino:/opt/dino/dino
+      - ./presets:/opt/dino/presets
       - ./settings.yaml:/opt/dino/settings.yaml
       - ${ROOT_FOLDER}:/DINO_ROOT
 

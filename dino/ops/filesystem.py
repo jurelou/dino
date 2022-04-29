@@ -108,6 +108,6 @@ def find_file(context, folder: Path):
     logger.critical(
         f"Could not find one of {context.op_config['file_names_patterns']} from {folder}"
     )
-    raise ValueError(
-        f"Could not find one of {context.op_config['file_names_patterns']} from {folder}"
-    )
+    # raise ValueError(
+    #     f"Could not find one of {context.op_config['file_names_patterns']} from {folder}"
+    # )

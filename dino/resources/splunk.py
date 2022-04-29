@@ -1,4 +1,4 @@
-from dagster import Field, get_dagster_logger, resource
+from dagster import Field, resource
 
 from dino.utils.splunk import SplunkHEC
 
@@ -13,8 +13,6 @@ from dino.utils.splunk import SplunkHEC
     }
 )
 def splunk(init_context):
-    logger = get_dagster_logger()
-    logger.info(f"Using splunk index {init_context.resource_config['index']}")
     return SplunkHEC(
         index=init_context.resource_config["index"],
         host=init_context.resource_config["host"],

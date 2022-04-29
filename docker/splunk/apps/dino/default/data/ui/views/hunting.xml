@@ -1,0 +1,63 @@
+<form theme="dark">
+  <label>Jobs-Hunting</label>
+  <description></description>
+  <init>
+    <unset token="help"></unset>
+  </init>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="time" token="timerange" searchWhenChanged="false">
+      <label>Fenêtre de temps</label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="multiselect" token="agent_id" searchWhenChanged="true">
+      <label>agent_id</label>
+      <choice value="*">Tous</choice>
+      <valuePrefix>agent.agentid="</valuePrefix>
+      <delimiter> OR </delimiter>
+      <valueSuffix>"</valueSuffix>
+      <fieldForLabel>agent.hostname</fieldForLabel>
+      <fieldForValue>agent.agentid</fieldForValue>
+      <search>
+        <query>`hurukai` log_type=investigation | stats count by agent.agentid, agent.hostname</query>
+        <earliest>$timerange.earliest$</earliest>
+        <latest>$timerange.latest$</latest>
+      </search>
+      <default>*</default>
+    </input>
+    <input type="text" token="job_id" searchWhenChanged="true"></input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Jobs</title>
+      <table>
+        <search>
+          <query>index=hurukai $agent_id$ log_type=investigation | dedup job_id sortby +@timestamp | stats values(object_type) by @timestamp, job_id</query>
+          <earliest>$timerange.earliest$</earliest>
+          <latest>$timerange.latest$</latest>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="job_id">$row.job_id$</set>
+          <set token="form.job_id">$row.job_id$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Résultat pour $job_id$</title>
+      <table depends="$job_id$">
+        <search>
+          <query>index=hurukai $agent_id$ log_type=investigation $job_id$ | fields - agent.* @version host index job_id job_instance_id punct source sourcetype splunk_server splunk_server_group tag tag::eventtype _raw timestamp _time log_type linecount | table @timestamp, object_type, *</query>
+          <earliest>$timerange.earliest$</earliest>
+          <latest>$timerange.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

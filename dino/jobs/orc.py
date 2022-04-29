@@ -240,7 +240,7 @@ def orc():
             "file_names_patterns": config["file_names_patterns"],
             "skip": config["skip"],
             "source": "autoruns",
-            "encoding": "utf-16",
+            "encoding": "iso-8859-1",
             "sourcetype": "dino:autoruns/json",
         }
 

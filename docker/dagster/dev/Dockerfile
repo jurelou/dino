@@ -1,6 +1,10 @@
 FROM python:3.8-slim
 
-RUN apt-get update && apt-get install -y libmagic-dev gcc g++
+RUN apt-get update && apt-get install -y \
+        libmagic-dev \
+        gcc \
+        g++ \
+        p7zip-full
 
 # Change working directory
 WORKDIR /opt/dino
