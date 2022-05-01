@@ -14,7 +14,7 @@ from dagster import Field, config_mapping
             "source_path": Field(str, description="File or folder containing orc archive(s) SHOULD START WITH /DINO_ROOT"),
             'recurse': Field(bool, description='Whether or not to recurse subfolders', default_value=True),
             'file_magic': Field(str, description='Find ORC archives of a given file type', default_value="7-zip archive data"),
-            'file_name_regex': Field(str, description='Find ORC archives matching a specific regex', default_value="^Collect_.*.7z"),
+            'file_names_regexes': Field([str], description='Find ORC archives matching a specific regex', default_value=["^Collect_.*.7z"]),
         },
         "mft": {
             "archive_name_patterns" : Field([str], description="MFT Archive name pattern", default_value=["MFT.7z"]),

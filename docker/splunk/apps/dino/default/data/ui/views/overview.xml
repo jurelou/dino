@@ -1,0 +1,510 @@
+<form theme="dark">
+  <label>TODO A</label>
+  <description></description>
+  <init>
+    <unset token="help"></unset>
+  </init>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="multiselect" token="index" searchWhenChanged="true">
+      <label>Index</label>
+      <choice value="*">All</choice>
+      <valuePrefix>index="</valuePrefix>
+      <delimiter> OR </delimiter>
+      <valueSuffix>"</valueSuffix>
+      <fieldForLabel>index</fieldForLabel>
+      <fieldForValue>index</fieldForValue>
+      <search>
+        <query>| eventcount summarize=false $index$  | where index!="main" and index!="summary" and index!="history" | dedup index  | fields index</query>
+      </search>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>EVTX</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_evtx"></set>
+            </condition>
+            <condition>
+              <set token="unit_evtx">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=evtx
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Devtx%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_evtx$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Zircolite</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_zircolite">0</set>
+            </condition>
+            <condition>
+              <set token="unit_zircolite">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=zircolite
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dzircolite%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_zircolite$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Autoruns</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_autoruns">0</set>
+            </condition>
+            <condition>
+              <set token="unit_autoruns">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=autoruns
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dautoruns%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_autoruns$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>MFT</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_mft"></set>
+            </condition>
+            <condition>
+              <set token="unit_mft">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=mft
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dmft%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_mft$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>USN journal</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_usn">0</set>
+            </condition>
+            <condition>
+              <set token="unit_usn">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=usn
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dusn%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_usn$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>NTFS Info</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_ntfs">0</set>
+            </condition>
+            <condition>
+              <set token="unit_ntfs">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=ntfs
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dntfs%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_ntfs$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>NTFS pehash</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_ntfs_pehash">0</set>
+            </condition>
+            <condition>
+              <set token="unit_ntfs_pehash">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=ntfs_pehash
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dntfs_pehash%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_ntfs_pehash$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>NTFS secdescr</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_ntfs_secdescr">0</set>
+            </condition>
+            <condition>
+              <set token="unit_ntfs_secdescr">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=ntfs_secdescr
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dntfs_secdescr%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_ntfs_secdescr$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>NTFS $I30</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_ntfs_i30">0</set>
+            </condition>
+            <condition>
+              <set token="unit_ntfs_i30">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=ntfs_i30
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dntfs_i30%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_ntfs_i30$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>ListDlls</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_listdlls">0</set>
+            </condition>
+            <condition>
+              <set token="unit_listdlls">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=listdlls
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dlistdlls%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_listdlls$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>system hives</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_system_hives">0</set>
+            </condition>
+            <condition>
+              <set token="unit_system_hives">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=system_hives
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dsystem_hives%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_system_hives$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>user hives</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_user_hives">0</set>
+            </condition>
+            <condition>
+              <set token="unit_user_hives">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=user_hives
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Duser_hives%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_user_hives$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>sam hives</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_sam_hives">0</set>
+            </condition>
+            <condition>
+              <set token="unit_sam_hives">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=sam_hives
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dsam_hives%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_sam_hives$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Tcpvcon</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_tcpvcon">0</set>
+            </condition>
+            <condition>
+              <set token="unit_tcpvcon">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=tcpvcon
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dtcpvcon%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_tcpvcon$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>PSService</title>
+      <single>
+        <search>
+          <progress>
+            <condition match="$job.resultCount$==0">
+              <set token="unit_psservice">0</set>
+            </condition>
+            <condition>
+              <set token="unit_psservice">$result.unit$</set>
+            </condition>
+          </progress>
+          <query>| tstats count where $index$ source=psservice
+| eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
+| eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
+| fields formatted_number, unit</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <drilldown target="_blank">
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dpsservice%20earliest%3D1%29</link>
+        </drilldown>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">events</option>
+        <option name="useColors">1</option>
+        <option name="unit">$unit_psservice$</option>
+        <option name="numberPrecision">0</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <search>
+          <query>| tstats count where $index$ by source</query>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+</form>

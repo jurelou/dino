@@ -39,10 +39,22 @@
 
 # rec(reg.root())
 
-from dino.jobs.orc import orc
+# from dino.jobs.orc import orc
+# import yaml
 
+# def load_yaml_file(path):
+#     with open(path, "r") as preset_file:
+#         try:
+#             return yaml.safe_load(preset_file)
+#         except yaml.YAMLError as err:
+#             print(f"Could not parse yaml file `{path}`.")
+#     return None
 
-orc.execute_in_process({
-    "gather_orc_archives": {"source_path": "/DINO_ROOT"},
-    "splunk": {"index": "lol", "host": "localhost"}
-})
+# orc_preset = load_yaml_file("presets/orc.yaml")
+
+# print(orc_preset)
+
+# orc.execute_in_process({
+#     "gather_orc_archives": {"source_path": "/DINO_ROOT"},
+#     "splunk": {"index": "lol", "host": "localhost"}
+# })

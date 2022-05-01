@@ -10,7 +10,7 @@ from dino import layout_manager
     config_schema={
         "file_extension": Field(
             str, description="Evtx file extension.", default_value="evtx"
-        ),
+        )
     },
 )
 def process_zircolite(context, folder: Path) -> Path:

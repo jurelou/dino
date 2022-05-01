@@ -1,0 +1,27 @@
+<form theme="dark">
+  <label>TODO A</label>
+  <description></description>
+  <init>
+    <unset token="help"></unset>
+  </init>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="multiselect" token="index" searchWhenChanged="true">
+      <label>Index</label>
+      <choice value="*">All</choice>
+      <valuePrefix>index="</valuePrefix>
+      <delimiter> OR </delimiter>
+      <valueSuffix>"</valueSuffix>
+      <fieldForLabel>index</fieldForLabel>
+      <fieldForValue>index</fieldForValue>
+      <search>
+        <query>| eventcount summarize=false $index$  | where index!="main" and index!="summary" and index!="history" | dedup index  | fields index</query>
+      </search>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+
+  <row>
+  </row>
+
+</form>

@@ -10,6 +10,7 @@ services:
   splunk:
     <<: *x-common
     container_name: splunk
+    image: dino/splunk
     build:
       context: ./docker/splunk
     environment:
@@ -17,13 +18,14 @@ services:
       SPLUNK_START_ARGS: --accept-license
     ports:
       - 8000:8000
-      # - 9997:9997
+      # - 9997:9997S
       - 8088:8088
       - 8089:8089
 
   dagster-dagit:
     <<: *x-common
     container_name: dagit
+    image: dino/dagster
     build:
       context: .
       dockerfile: ./docker/dagster/dev/Dockerfile
@@ -33,6 +35,7 @@ services:
   dagster-daemon:
     <<: *x-common
     container_name: dagster
+    image: dino/dagster
     build: 
       context: .
       dockerfile: ./docker/dagster/dev/Dockerfile
@@ -42,7 +45,6 @@ services:
     volumes:
       - ./dino:/opt/dino/dino
       - ./presets:/opt/dino/presets
-      - ./settings.yaml:/opt/dino/settings.yaml
       - ${ROOT_FOLDER}:/DINO_ROOT
 
   dagster-postgres:

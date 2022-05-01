@@ -1,34 +1,86 @@
-gather_orc_archives:
-  source_path: /DINO_ROOT
+
+---
 splunk:
+  host: splunk
+  port: 8089
   index: myindex
-hives:
-  sam:
-    enabled: false
-  user:
-    enabled: false
-  system:
-    enabled: false
-ntfs:
-  i30:
-    enabled: false
-  info:
-    enabled: false
-  pehash:
-    enabled: false
-  secdescr:
-    enabled: false
-usn:
-  enabled: false
+  username: dino
+  password: password
+  
+gather_orc_archives:
+  source_path: /DINO_ROOT/orcs
+  recurse: True
+  file_magic: 7-zip archive data
+  file_names_regexes:
+    - ^Collect_.*.7z
 mft:
-  enabled: false
-evtx:
-  enabled: false
+    archive_name_patterns:
+        - MFT.7z
+    enabled: True
+    
 autoruns:
-  enabled: false
-tcpvcon:
-  enabled: false
-psservice:
-  enabled: false
-listdlls:
-  enabled: false
+    file_name_patterns:
+        - "*utorun*.csv"
+    enabled: True
+        
+zircolite:
+    files_extension: "evtx_data"
+
+evtx:
+    archive_name_patterns:
+        - "Evtx.7z"
+        - "Event.7z"
+        - "Events.7z"
+    enabled: True
+
+hives:
+    sam:
+        archive_name_patterns:
+            - "SAM.7z"
+        file_names_patterns:
+            - "*_data"
+        enabled: True
+    
+    system:
+        archive_name_patterns:
+            - SystemHives.7z
+        file_names_patterns:
+            - "*_data"
+        enabled: True
+    
+    user:
+        archive_name_patterns:
+            - "UserHives.7z"
+        file_names_patterns:
+            - "*_data"
+        enabled: True
+    
+
+ntfs:
+    info:
+        archive_name_patterns:
+            - NTFSInfo.7z
+        file_names_patterns:
+            - NTFSInfo_*.csv
+        enabled: True
+    
+    i30:
+        archive_name_patterns:
+            - "NTFSInfo_i30Info.7z"
+        file_names_patterns:
+            - I30Info_*.csv
+        enabled: True
+    
+    pehash:
+        archive_name_patterns: 
+            - "NTFSInfo_pehash.7z"
+        file_names_patterns:
+            - "NTFSInfo_*.csv"
+        enabled: True
+    
+    secdescr:
+        archive_name_patterns:
+            - NTFSInfo_SecDesc.7z
+        file_names_patterns:
+            - SecDescr_*.csv
+        enabled: True
