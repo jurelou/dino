@@ -4,7 +4,7 @@ import ujson
 from dagster import Field, get_dagster_logger, op
 from evtx import PyEvtxParser
 
-from dino.utils.filesystem import find_files_matching_patterns
+#from dino.utils.filesystem import find_files_matching_patterns
 
 
 def flatten_dict(j):
@@ -24,35 +24,34 @@ def flatten_dict(j):
 
 @op(
     required_resource_keys={"splunk"},
-    config_schema={
-        "file_names_regex": Field(
-            [str],
-            description="Evtx file extension.",
-            default_value=["*.evtx", "*.evtx_data"],
-        ),
-    },
+    # config_schema={
+    #     "file_names_regex": Field(
+    #         [str],
+    #         description="Evtx file extension.",
+    #         default_value=["*.evtx", "*.evtx_data"],
+    #     ),
+    # },
 )
-def process_evtx(context, folder: Path):
+def process_evtx(context, evtx_file: Path):
     """Runs evtxdump against a folder of evtx files and sends them to splunk."""
     # TODO: do not send events directly to splunk.
     # Since dagster does not allow to return a DynamicOut here, we send logs directly (to not lose performance)
     # TODO: Looping throught each event is is very slow !! maybe use jq or something else
     logger = get_dagster_logger()
+    logger.debug(f"Parsing evtx file {evtx_file}")
+    # for f in find_files_matching_patterns(
+    #     folder, context.op_config["file_names_regex"]
+    # ):
 
-    for f in find_files_matching_patterns(
-        folder, context.op_config["file_names_regex"]
-    ):
-
-        with context.resources.splunk.stream(
-            host=str(f.absolute()),
-            sourcetype="dino:evtx/json",
-            source="evtx",
-        ) as hec:
-
-            with open(f, "rb") as raw_evtx:
-                parser = PyEvtxParser(raw_evtx)
-                for r in parser.records_json():
-                    flat_event = flatten_dict(ujson.loads(r["data"]))
-                    flat_event["timestamp"] = r["timestamp"]
-                    flat_event.pop("xmlns", None)
-                    hec.send_dict(flat_event)
+    with context.resources.splunk.stream(
+        host=str(evtx_file.absolute()),
+        sourcetype="dino:evtx/json",
+        source="evtx",
+    ) as hec:
+        with open(evtx_file, "rb") as raw_evtx:
+            parser = PyEvtxParser(raw_evtx)
+            for r in parser.records_json():
+                flat_event = flatten_dict(ujson.loads(r["data"]))
+                flat_event["timestamp"] = r["timestamp"]
+                flat_event.pop("xmlns", None)
+                hec.send_dict(flat_event)

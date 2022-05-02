@@ -1,26 +1,49 @@
 """Collection of ORC jobs"""
-from dagster import configured, job
-
+from dagster_celery import celery_executor
+from dagster import configured, job, op, DynamicOut, DynamicOutput, Any, get_dagster_logger, fs_io_manager
+from uuid import uuid4
 from dino.ops.artifacts.evtx import process_evtx
 from dino.ops.artifacts.mft import process_mft
 from dino.ops.artifacts.registry import process_registry
-from dino.ops.artifacts.zircolite import process_zircolite
+from dino.ops.artifacts.chainsaw import process_chainsaw
 from dino.ops.artifacts.tcpvcon import process_tcpvcon
 from dino.ops.artifacts.psservice import process_psservice
 from dino.ops.artifacts.listdlls import process_listdlls
 
 from dino.ops.decompress import decompress_file
-from dino.ops.filesystem import find_file, gather_files
+from dino.ops.filesystem import find_file, generate_files, find_files
 from dino.ops.splunk import send_csv_files, send_json_file
 from dino.presets.orc import orc_preset
 from dino.resources.splunk import splunk
 
 
-@job(resource_defs={"splunk": splunk}, config=orc_preset)
+@op(out=DynamicOut(Any))
+def make_dynamic(items: Any):
+    logger = get_dagster_logger()
+    logger.info(f"Make dynamic output from {items}")
+    for item in items:
+        for sub in item:
+            yield DynamicOutput(value=sub, mapping_key=uuid4().hex)
+
+# @op
+# def print_op(data):
+#     logger = get_dagster_logger()
+#     logger.info("==============================================================")
+#     logger.info(f"PRINT OP: {data}")
+#     logger.info("==============================================================")
+
+@job(
+    config=orc_preset,
+    executor_def=celery_executor,
+    resource_defs={
+        "splunk": splunk,
+        "io_manager": fs_io_manager.configured({"base_dir": "/var/local/dino_io_managers"})
+    }
+)
 def orc():
     """Parse orc files."""
-    gather_orc_archives = gather_files.alias("gather_orc_archives")
-    orc_archives = gather_orc_archives().map(decompress_file)
+    generate_orc_archives = generate_files.alias("generate_orc_archives")
+    orc_archives = generate_orc_archives().map(decompress_file)
 
     ###########################################################################################
     # LISTDLLS
@@ -60,52 +83,54 @@ def orc():
     orc_archives.map(mft_find_archive).map(mft_decompress_archive).map(process_mft)
 
     ###########################################################################################
-    # REGISTRY
+    # REGISTRY sam hives
     ###########################################################################################
-    # CONFIGURE ops
     hives_sam_find_archive = find_file.alias("hives_sam_find_archive")
-    hives_system_find_archive = find_file.alias("hives_system_find_archive")
-    hives_user_find_archive = find_file.alias("hives_user_find_archive")
-
     hives_sam_decompress_archive = decompress_file.alias("hives_sam_decompress_archive")
-    hives_system_decompress_archive = decompress_file.alias(
-        "hives_system_decompress_archive"
-    )
+    hives_sam_find_files = find_files.alias("hives_sam_find_files")
+    hives_sam_process_file = process_registry.configured({
+        "source": "sam_hives",
+    }, name="hives_sam_process_file")
+
+    sam_hives = orc_archives.map(hives_sam_find_archive).map(hives_sam_decompress_archive).map(hives_sam_find_files).collect()
+    make_dynamic(sam_hives).map(hives_sam_process_file)
+
+    ###########################################################################################
+    # REGISTRY user hives
+    ###########################################################################################
+    hives_user_find_archive = find_file.alias("hives_user_find_archive")
     hives_user_decompress_archive = decompress_file.alias(
         "hives_user_decompress_archive"
     )
+    hives_user_find_files = find_files.alias("hives_user_find_files")
+    hives_user_process_file = process_registry.configured({
+        "source": "user_hives",
+    }, name="hives_user_process_file")
 
-    @configured(process_registry, config_schema={"file_names_patterns": [str]})
-    def hives_sam_process_files(config):
-        return {
-            "file_names_patterns": config["file_names_patterns"],
-            "source": "sam_hives",
-        }
 
-    @configured(process_registry, config_schema={"file_names_patterns": [str]})
-    def hives_system_process_files(config):
-        return {
-            "file_names_patterns": config["file_names_patterns"],
+    user_hives = orc_archives.map(hives_user_find_archive).map(hives_user_decompress_archive).map(
+        hives_user_find_files
+    ).collect()
+    make_dynamic(user_hives).map(hives_user_process_file)
+
+    ###########################################################################################
+    # REGISTRY system hives
+    ###########################################################################################
+    hives_system_find_archive = find_file.alias("hives_system_find_archive")
+    hives_system_decompress_archive = decompress_file.alias(
+        "hives_system_decompress_archive"
+    )
+    hives_system_find_files = find_files.alias("hives_system_find_files")
+    hives_system_process_file = process_registry.configured({
             "source": "system_hives",
-        }
+    }, name="hives_system_process_file")
 
-    @configured(process_registry, config_schema={"file_names_patterns": [str]})
-    def hives_user_process_files(config):
-        return {
-            "file_names_patterns": config["file_names_patterns"],
-            "source": "user_hives",
-        }
 
-    # RUN pipeline
-    orc_archives.map(hives_sam_find_archive).map(hives_sam_decompress_archive).map(
-        hives_sam_process_files
-    )
-    orc_archives.map(hives_system_find_archive).map(
+    user_hives = orc_archives.map(hives_system_find_archive).map(
         hives_system_decompress_archive
-    ).map(hives_system_process_files)
-    orc_archives.map(hives_user_find_archive).map(hives_user_decompress_archive).map(
-        hives_user_process_files
-    )
+    ).map(hives_system_find_files).collect()
+
+    make_dynamic(user_hives).map(hives_system_process_file)
 
     ###########################################################################################
     # EVTX
@@ -113,15 +138,17 @@ def orc():
     # CONFIGURE ops
     evtx_find_archive = find_file.alias("evtx_find_archive")
     evtx_decompress_archive = decompress_file.alias("evtx_decompress_archive")
-    zircolite_send_file_configured = send_json_file.configured(
-        {"source": "zircolite", "sourcetype": "dino:zircolite/json"},
-        name="zircolite_send_file",
-    )
+    evtx_find_files = find_files.alias("evtx_find_files")
 
-    # RUN pipeline
+    # RUN main pipeline
     evtx_folders = orc_archives.map(evtx_find_archive).map(evtx_decompress_archive)
-    evtx_folders.map(process_zircolite).map(zircolite_send_file_configured)
-    evtx_folders.map(process_evtx)
+
+    # Run chainsaw
+    evtx_folders.map(process_chainsaw)
+
+    # Run evtx dump
+    evtx_files = evtx_folders.map(evtx_find_files).collect()
+    make_dynamic(evtx_files).map(process_evtx)
 
     ###########################################################################################
     # NTFS INFO

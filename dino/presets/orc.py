@@ -3,6 +3,9 @@ from dagster import Field, config_mapping
 
 @config_mapping(
     config_schema={
+        "celery_executor": {
+            "broker": Field(str, description="Celery broker url", default_value='pyamqp://dino:SPKKJxqHIc1OS92raTeo@rabbitmq:5672/dino') 
+        },
         "splunk": {
             "host": Field(str, description="Splunk hostname", default_value="splunk"),
             "port": Field(int, description="Splunk port", default_value=8089),
@@ -10,7 +13,7 @@ from dagster import Field, config_mapping
             "username": Field(str, description="Splunk username", default_value="dino"),
             "password": Field(str, description="Splunk password", default_value="password")
         },
-        "gather_orc_archives": {
+        "generate_orc_archives": {
             "source_path": Field(str, description="File or folder containing orc archive(s) SHOULD START WITH /DINO_ROOT"),
             'recurse': Field(bool, description='Whether or not to recurse subfolders', default_value=True),
             'file_magic': Field(str, description='Find ORC archives of a given file type', default_value="7-zip archive data"),
@@ -24,12 +27,10 @@ from dagster import Field, config_mapping
             "file_name_patterns": Field([str], description="Autoruns file name patterns", default_value=["*utorun*.csv"]),
             "enabled": Field(bool, description="Whether or not to activate this module", default_value=True),
         },
-        "zircolite": {
-            "files_extension": Field(str, description="Evtx files extension (used by zircolite)", default_value="evtx_data"),
-        },
         "evtx": {
+            "file_names_patterns": Field([str], description="EVTX file name patterns", default_value=["*.evtx", "*.evtx_data"]),
             "archive_name_patterns": Field([str], description="Archive name containing windows event logs", default_value=["Evtx.7z", "Event.7z", "Events.7z"]),
-            "enabled": Field(bool, description="Whether or not to activate this module (this will also disable zircolite)", default_value=True),
+            "enabled": Field(bool, description="Whether or not to activate this module (this will also disable chainsaw)", default_value=True),
         },
         "hives": {
             "sam": {
@@ -50,7 +51,7 @@ from dagster import Field, config_mapping
         },
         "ntfs": {
             "info": {
-                "archive_name_patterns": Field([str], description="Archive name containing NTFSInfo files", default_value=["NTFSInfo.7z"]),
+                "archive_name_patterns": Field([str], description="Archive name containing NTFSInfo files", default_value=["NTFSInfo.7z", "NTFSInfo_offline.7z"]),
                 "file_names_patterns": Field([str], description="File pattern matching decompressed NTFSInfo files", default_value=["NTFSInfo_*.csv"]),
                 "enabled": Field(bool, description="Whether or not to activate this module", default_value=True),
             },
@@ -91,6 +92,9 @@ from dagster import Field, config_mapping
 )
 def orc_preset(val):
     return {
+        "execution": {
+            "config": val["celery_executor"]
+        },
         "resources": {
             "splunk": {
                 "config": {
@@ -103,8 +107,8 @@ def orc_preset(val):
             }
         },
         "ops": {
-            "gather_orc_archives": {
-                "config": val["gather_orc_archives"]
+            "generate_orc_archives": {
+                "config": val["generate_orc_archives"]
             },
             "mft_find_archive": {
                 "config": {
@@ -118,15 +122,21 @@ def orc_preset(val):
                     "skip": not val["autoruns"]["enabled"]
                 }
             },
-            "process_zircolite": {
+            "process_chainsaw": {
                 "config": {
-                    "file_extension": val["zircolite"]["files_extension"]
+                    "file_names_patterns": val["evtx"]["file_names_patterns"]
                 }
             },
             "evtx_find_archive": {
                 "config": {
                     "file_names_patterns": val["evtx"]["archive_name_patterns"],
                     "skip": not val["evtx"]["enabled"]
+                }
+            },
+            "evtx_find_files": {
+                "config": {
+                    "file_names_patterns": val["evtx"]["file_names_patterns"],
+
                 }
             },
             "hives_sam_find_archive": {
@@ -138,7 +148,7 @@ def orc_preset(val):
             },
             "hives_system_find_archive": {
                 "config": {
-                    "file_names_patterns": val["hives"]["system"]["archive_name_patterns"],
+                    "file_names_patterns": val[f"hives"]["system"]["archive_name_patterns"],
                     "skip": not val["hives"]["system"]["enabled"]
                 }
             },
@@ -178,17 +188,17 @@ def orc_preset(val):
                     "skip": not val["usn"]["enabled"]
                 }
             },
-            "hives_sam_process_files": {
-                "config": {
-                    "file_names_patterns": val["hives"]["sam"]["file_names_patterns"],
-                }
-            },
-            "hives_system_process_files": {
+            "hives_system_find_files": {
                 "config": {
                     "file_names_patterns": val["hives"]["system"]["file_names_patterns"],
                 }
             },
-            "hives_user_process_files": {
+            "hives_sam_find_files": {
+                "config": {
+                    "file_names_patterns": val["hives"]["system"]["file_names_patterns"],
+                }
+            },
+            "hives_user_find_files": {
                 "config": {
                     "file_names_patterns": val["hives"]["user"]["file_names_patterns"],
                 }

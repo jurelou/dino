@@ -4,7 +4,7 @@ from pathlib import Path
 from dagster import Field, get_dagster_logger, op
 from Registry import Registry
 
-from dino.utils.filesystem import find_files_matching_patterns
+#from dino.utils.filesystem import find_files_matching_patterns
 
 
 def parse_registry_hive(hec, key):
@@ -49,29 +49,26 @@ def parse_registry_hive(hec, key):
 @op(
     required_resource_keys={"splunk"},
     config_schema={
-        "file_names_patterns": Field(
-            [str], description="Registry hive names patterns.", default_value=["*_data"]
-        ),
         "source": Field(
             str, description="Source registry key (SAM, Security, User, ...)"
         ),
     },
 )
-def process_registry(context, folder: Path):
+def process_registry(context, hive_path: Path):
     """Parses registry hives against a folder of files."""
     logger = get_dagster_logger()
     logger.info(
-        f"Process registry hives from `{folder}` with files matching `{context.op_config['file_names_patterns']}`"
+        f"Process registry hive `{hive_path}` ({context.op_config['source']})"
     )
 
-    for f in find_files_matching_patterns(
-        folder, context.op_config["file_names_patterns"]
-    ):
-        logger.debug(f"Found hive {f.absolute()}")
-        reg = Registry.Registry(str(f.absolute()))
-        with context.resources.splunk.stream(
-            sourcetype="dino:registry/json",
-            host=str(f.absolute()),
-            source=context.op_config["source"],
-        ) as hec:
-            parse_registry_hive(hec, reg.root())
+    # for f in find_files_matching_patterns(
+    #     folder, context.op_config["file_names_patterns"]
+    # ):
+    #     logger.debug(f"Found hive {f.absolute()}")
+    reg = Registry.Registry(str(hive_path.absolute()))
+    with context.resources.splunk.stream(
+        sourcetype="dino:registry/json",
+        host=str(hive_path.absolute()),
+        source=context.op_config["source"],
+    ) as hec:
+        parse_registry_hive(hec, reg.root())

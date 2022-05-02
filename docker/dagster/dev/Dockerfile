@@ -17,11 +17,10 @@ RUN pip install --upgrade pip \
 
 # Copy source code
 COPY ./docker/dagster/dev/dagster.yaml .
+COPY ./docker/dagster/dev/celery_config.yaml .
 COPY ./docker/dagster/dev/workspace.yaml .
 COPY  ./dino ./dino
 COPY  ./external_tools ./external_tools
 
-# Install zircolite
-RUN pip install -r ./external_tools/Zircolite/requirements.txt
 
 CMD ["dagit", "-w", "workspace.yaml", "-h", "0.0.0.0", "-p", "3000"]

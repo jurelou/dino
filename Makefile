@@ -2,12 +2,14 @@ include .env
 # all:
 # 	docker-compose up -d --build
 
+WORKERS?=4
+
 all:
 	mkdir -p ${ROOT_FOLDER} || true
-	docker-compose -f docker-compose-dev.yml up -d
+	docker-compose -f docker-compose-dev.yml up -d --force-recreate --scale worker=${WORKERS}
 
 stop:
-	docker-compose -f docker-compose-dev.yml down -v
+	docker-compose -f docker-compose-dev.yml down
 
 rm:
 	sudo rm -rf ${ROOT_FOLDER}/DINO_SPLUNK_UNIVERSAL_FORWARDER
@@ -24,8 +26,11 @@ setup:
 	@echo "*====================================================*"
 
 re: stop
-	docker-compose -f docker-compose-dev.yml up -d --build --force-recreate
+	docker-compose -f docker-compose-dev.yml up -d --force-recreate --build --scale worker=${WORKERS}
 
 
 format:
 	@tox
+
+splunk_app:
+	cd docker/splunk/apps && tar -czvf ../../../TA-dino.tgz dino

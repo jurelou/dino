@@ -1,11 +1,12 @@
 <nav color="#20C20E" search_view="search">
 
-  <view name="overview" />
+  <view name="overview" default="true"/>
   <view name="sigma" />
 
-  <!-- <view name="agents" default="true" />
-  <view name="alertes" />
-  <view name="hunting" /> -->
+  <collection label="Artifacts">
+    <view source="all" match="artifact_" />
+  </collection>
+
 
   <collection label="TODO A">
     <view source="all" match="a_" />
@@ -15,7 +16,6 @@
     <view source="all" match="b_" />
   </collection>
 
-  <view name="metrics" />
   <view name="search" />
 
 </nav>

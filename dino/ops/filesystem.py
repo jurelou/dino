@@ -35,7 +35,7 @@ def check_file_matches_patterns(file, patterns):
     },
     out=DynamicOut(Path),
 )
-def gather_files(context) -> Iterator[Path]:
+def generate_files(context) -> Iterator[Path]:
     """Gather files from a given path."""
     logger = get_dagster_logger()
 
@@ -124,3 +124,34 @@ def find_file(context, folder: Path):
     # raise ValueError(
     #     f"Could not find one of {context.op_config['file_names_patterns']} from {folder}"
     # )
+
+
+@op(
+    config_schema={
+        "file_names_patterns": Field(
+            [str], description="Find a single file matching a specific pattern"
+        ),
+        "skip": Field(
+            bool,
+            description="Whether or not to skip execution of this op (returns nothing)",
+            default_value=False,
+        ),
+    },
+)
+def find_files(context, folder: Path) -> List[Path]:
+    """Find files in a given folder."""
+    logger = get_dagster_logger()
+    if context.op_config["skip"]:
+        logger.info(f"Skipping execution of find_files for {folder}")
+        return []
+    logger.debug(
+        f"Searching for files matching {context.op_config['file_names_patterns']} in {folder})"
+    )
+    files = []
+    for pattern in context.op_config["file_names_patterns"]:
+        files.extend(folder.rglob(pattern))
+
+    logger.info(f"found {len(files)}")
+    return files
+
+

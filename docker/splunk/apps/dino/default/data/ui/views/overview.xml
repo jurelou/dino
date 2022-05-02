@@ -1,5 +1,5 @@
 <form theme="dark">
-  <label>TODO A</label>
+  <label>Overview</label>
   <description></description>
   <init>
     <unset token="help"></unset>
@@ -14,7 +14,7 @@
       <fieldForLabel>index</fieldForLabel>
       <fieldForValue>index</fieldForValue>
       <search>
-        <query>| eventcount summarize=false $index$  | where index!="main" and index!="summary" and index!="history" | dedup index  | fields index</query>
+        <query>| eventcount summarize=false $index$  | where index!="cim_modactions" and index!="summary" and index!="history" | dedup index  | fields index</query>
       </search>
       <default>*</default>
       <initialValue>*</initialValue>
@@ -52,24 +52,24 @@
       </single>
     </panel>
     <panel>
-      <title>Zircolite</title>
+      <title>chainsaw</title>
       <single>
         <search>
           <progress>
             <condition match="$job.resultCount$==0">
-              <set token="unit_zircolite">0</set>
+              <set token="unit_chainsaw">0</set>
             </condition>
             <condition>
-              <set token="unit_zircolite">$result.unit$</set>
+              <set token="unit_chainsaw">$result.unit$</set>
             </condition>
           </progress>
-          <query>| tstats count where $index$ source=zircolite
+          <query>| tstats count where $index$ source=chainsaw
 | eval formatted_number=case(count&gt;=1000000,round(count/1000000,1),count&gt;=1000,round(count/1000, 0),count&gt;=0,count)
 | eval unit=case(floor(count/1000000) &gt;= 1,"M",floor(count/1000) &gt;= 1,"K", count&lt;1000, "")
 | fields formatted_number, unit</query>
         </search>
         <drilldown target="_blank">
-          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dzircolite%20earliest%3D1%29</link>
+          <link>/app/search/search?q=%7C%20tstats%20count%20where%20%28index%3D%2A%20source%3Dchainsaw%20earliest%3D1%29</link>
         </drilldown>
         <option name="colorMode">block</option>
         <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
@@ -77,7 +77,7 @@
         <option name="refresh.display">progressbar</option>
         <option name="underLabel">events</option>
         <option name="useColors">1</option>
-        <option name="unit">$unit_zircolite$</option>
+        <option name="unit">$unit_chainsaw$</option>
         <option name="numberPrecision">0</option>
       </single>
     </panel>

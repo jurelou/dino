@@ -23,7 +23,7 @@
 
 Clone the repository (including sub modules) with:
 ```
-git clone --recurse-submodules https://github.com/jurelou/dino
+git clone https://github.com/jurelou/dino
 cd dino
 ```
 
@@ -87,22 +87,30 @@ You can start launching jobs via dagit!
 |files (GetSamples, Artefacts, ...) - yara rules | :x: | :x:|
 |All GetThis.csv | :x: | :x:|
 |ProcessStatistics.csv | :x: | :x:|
+|FatInfo | :x: | :x:|
+|Residents | :x: | :x:|
+|UefiFull | :x: | :x:|
+|ExtAttrs | :x: | :x:|
+|FuzzyHash | :x: | :x:|
 
 
 # Known bugs
 
-- CRC32 errors while trying to unzip ORCs
+- random CRC32 errors while trying to unzip ORCs
 - When converting csv to json, some keys have quotes, (eg. "ComputerName")
-- 
+
+
 # TODO
 
-- csv files: remove empty values
-- splunk HEC optimization (bulk insert)
-- set correct host values
-- make a clean dev environment whithout having to rebuild everything
-- maybe use a threadpool in the evtx parser (until dagster allow us to use nested DynamicOut)
-- allow to skip/disable artifacts
-- registry parser raises a lot of errors, a lot of keys might not be parsed
+- [ ]: csv files: remove empty values
+- [ ]: splunk HEC optimization (bulk insert)
+- [ ]: set correct host values
+- [ ]: make a clean dev environment whithout having to rebuild everything
+- [ ]: maybe use a threadpool in the evtx parser (until dagster allow us to use nested DynamicOut)
+- [x]: allow to skip/disable artifacts
+- [ ]: registry parser raises a lot of errors, a lot of keys might not be parsed
+- [ ]: https://github.com/mandiant/capa
+- [ ]: Autogenerates config from orc config
 
 
 ## Built With

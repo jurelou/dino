@@ -19,7 +19,6 @@ def decompress_7z(filepath: Path, passwords: List[str] = []):
     with py7zr.SevenZipFile(filepath, mode="r") as archive:
         encrypted = archive.needs_password()
 
-
     # if not encrypted:
     command = ["7z", "x", filepath.absolute(), f"-o{output_folder.absolute()}", "-y", "-bd"]
 

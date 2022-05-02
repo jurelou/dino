@@ -2,11 +2,26 @@
 volumes:
   dagster-postgres:
     driver: local
+  io_manager:
+    driver: local
 
 x-common: &x-common
   restart: unless-stopped
 
 services:
+  rabbitmq:
+    image: rabbitmq:3.8.2
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: dino
+      RABBITMQ_DEFAULT_PASS: SPKKJxqHIc1OS92raTeo
+      RABBITMQ_DEFAULT_VHOST: dino
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
   splunk:
     <<: *x-common
     container_name: splunk
@@ -40,12 +55,25 @@ services:
       context: .
       dockerfile: ./docker/dagster/dev/Dockerfile
     command: "dagster-daemon run"
-    environment:
-      DYNACONF_ROOT_FOLDER: /DINO_ROOT
     volumes:
       - ./dino:/opt/dino/dino
       - ./presets:/opt/dino/presets
       - ${ROOT_FOLDER}:/DINO_ROOT
+      - io_manager:/var/local/dino_io_managers
+
+  worker:
+    <<: *x-common
+    image: dino/dagster
+    build: 
+      context: .
+      dockerfile: ./docker/dagster/dev/Dockerfile
+    command: "dagster-celery worker start -y celery_config.yaml -A dagster_celery.app"
+    volumes:
+      - ./dino:/opt/dino/dino
+      - ./presets:/opt/dino/presets
+      - ${ROOT_FOLDER}:/DINO_ROOT
+      - io_manager:/var/local/dino_io_managers
+
 
   dagster-postgres:
     <<: *x-common
@@ -54,6 +82,6 @@ services:
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_PASSWORD=secret
+      - POSTGRES_PASSWORD=ZwRQ1XCLT8VdfjlC43gY
     volumes:
       - dagster-postgres:/var/lib/postgresql/data

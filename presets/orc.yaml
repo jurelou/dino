@@ -1,86 +1,103 @@
-
----
 splunk:
   host: splunk
   port: 8089
   index: myindex
   username: dino
   password: password
-  
-gather_orc_archives:
-  source_path: /DINO_ROOT/orcs
-  recurse: True
+
+generate_orc_archives:
+  source_path: /DINO_ROOT/orcs/vsmall
+  recurse: true
   file_magic: 7-zip archive data
   file_names_regexes:
-    - ^Collect_.*.7z
-mft:
-    archive_name_patterns:
-        - MFT.7z
-    enabled: True
-    
-autoruns:
-    file_name_patterns:
-        - "*utorun*.csv"
-    enabled: True
-        
-zircolite:
-    files_extension: "evtx_data"
+    - ^[cC]ollect_.*.7z
+    - ^[oO][rR][cC].*.7z
 
 evtx:
-    archive_name_patterns:
-        - "Evtx.7z"
-        - "Event.7z"
-        - "Events.7z"
-    enabled: True
+  enabled: true
+  archive_name_patterns:
+    - Evtx.7z
+    - Event.7z
+    - Events.7z
+  file_names_patterns:
+    - "*.evtx"
+    - "*.evtx_data"
 
 hives:
-    sam:
-        archive_name_patterns:
-            - "SAM.7z"
-        file_names_patterns:
-            - "*_data"
-        enabled: True
-    
-    system:
-        archive_name_patterns:
-            - SystemHives.7z
-        file_names_patterns:
-            - "*_data"
-        enabled: True
-    
-    user:
-        archive_name_patterns:
-            - "UserHives.7z"
-        file_names_patterns:
-            - "*_data"
-        enabled: True
-    
+  sam:
+    enabled: true
+    archive_name_patterns:
+      - SAM.7z
+    file_names_patterns:
+      - "*_data"
+  system:
+    enabled: true
+    archive_name_patterns:
+      - SystemHives.7z
+    file_names_patterns:
+      - "*_data"
+  user:
+    enabled: true
+    archive_name_patterns:
+      - UserHives.7z
+    file_names_patterns:
+      - "*_data"
 
 ntfs:
-    info:
-        archive_name_patterns:
-            - NTFSInfo.7z
-        file_names_patterns:
-            - NTFSInfo_*.csv
-        enabled: True
-    
-    i30:
-        archive_name_patterns:
-            - "NTFSInfo_i30Info.7z"
-        file_names_patterns:
-            - I30Info_*.csv
-        enabled: True
-    
-    pehash:
-        archive_name_patterns: 
-            - "NTFSInfo_pehash.7z"
-        file_names_patterns:
-            - "NTFSInfo_*.csv"
-        enabled: True
-    
-    secdescr:
-        archive_name_patterns:
-            - NTFSInfo_SecDesc.7z
-        file_names_patterns:
-            - SecDescr_*.csv
-        enabled: True
+  info:
+    enabled: true
+    archive_name_patterns:
+      - NTFSInfo.7z
+    file_names_patterns:
+      - NTFSInfo_*.csv
+  i30:
+    enabled: true
+    archive_name_patterns:
+      - NTFSInfo_i30Info.7z
+    file_names_patterns:
+      - I30Info_*.csv
+  pehash:
+    enabled: true
+    archive_name_patterns:
+      - NTFSInfo_pehash.7z
+    file_names_patterns:
+      - NTFSInfo_*.csv
+  secdescr:
+    enabled: true
+    archive_name_patterns:
+      - NTFSInfo_SecDesc.7z
+    file_names_patterns:
+      - SecDescr_*.csv
+
+listdlls:
+  enabled: True
+  file_names_patterns:
+    - Listdlls.txt
+
+psservice:
+  enabled: True
+  file_names_patterns:
+    - PsService.txt
+
+tcpvcon:
+  enabled: True
+  file_names_patterns:
+    - Tcpvcon.txt
+    - tcpvcon.txt
+
+usn:
+  enabled: True
+  archive_name_patterns:
+    - USNInfo.7z
+  file_names_patterns:
+    - USNInfo_*.csv
+
+mft:
+  enabled: true
+  archive_name_patterns:
+    - MFT.7z
+
+autoruns:
+  enabled: true
+  file_name_patterns:
+    - "*utorun*.csv"

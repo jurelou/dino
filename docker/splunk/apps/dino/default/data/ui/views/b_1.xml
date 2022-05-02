@@ -1,5 +1,5 @@
 <form theme="dark">
-  <label>TODO A</label>
+  <label>TODO B</label>
   <description></description>
   <init>
     <unset token="help"></unset>

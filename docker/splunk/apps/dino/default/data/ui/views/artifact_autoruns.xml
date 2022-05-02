@@ -1,0 +1,49 @@
+<form theme="dark">
+  <label>Autoruns</label>
+  <description></description>
+  <init>
+    <unset token="help"></unset>
+  </init>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="multiselect" token="index" searchWhenChanged="true">
+      <label>Index</label>
+      <choice value="*">All</choice>
+      <valuePrefix>index="</valuePrefix>
+      <delimiter> OR </delimiter>
+      <valueSuffix>"</valueSuffix>
+      <fieldForLabel>index</fieldForLabel>
+      <fieldForValue>index</fieldForValue>
+      <search>
+        <query>| eventcount summarize=false $index$  | where index!="main" and index!="summary" and index!="history" | dedup index  | fields index</query>
+      </search>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>UNVERIFIED scheduled tasks</title>
+      <table>
+        <search>
+          <query>$index$ source=autoruns Category=Tasks Enabled!="" Signer!="(Verified)*" | table Company, Signer, Description, Entry, "Image Path", "Launch String"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>UNVERIFIED logon scripts</title>
+      <table>
+        <search>
+          <query>$index$ source=autoruns Category=Logon Signer!="(Verified)*" | table Company, Signer, Description, Profile, "Entry Location", "Image Path", "Launch String"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -2,9 +2,9 @@
 from dagster import configured, job, Field, config_mapping
 
 from dino.ops.artifacts.evtx import process_evtx
-from dino.ops.artifacts.zircolite import process_zircolite
+from dino.ops.artifacts.chainsaw import process_chainsaw
 from dino.ops.decompress import decompress_file
-from dino.ops.filesystem import find_file, gather_files
+from dino.ops.filesystem import find_file, generate_files
 from dino.ops.splunk import send_csv_files, send_json_file
 from dino.resources.splunk import splunk
 
@@ -19,8 +19,8 @@ from dino.resources.splunk import splunk
             "username": Field(str, description="Splunk username", default_value="dino"),
             "password": Field(str, description="Splunk password", default_value="password")
         },
-        "zircolite": {
-            "files_extension": Field(str, description="Evtx files extension (used by zircolite)", default_value="evtx_data"),
+        "chainsaw": {
+            "files_extension": Field(str, description="Evtx files extension (used by chainsaw)", default_value="evtx_data"),
         },
     }
 )
@@ -38,9 +38,9 @@ def evtx_preset(val):
             }
         },
         "ops": {
-            "process_zircolite": {
+            "process_chainsaw": {
                 "config": {
-                    "file_extension": val["zircolite"]["files_extension"]
+                    "file_extension": val["chainsaw"]["files_extension"]
                 }
             },
             "gather_evtx": {
@@ -56,7 +56,7 @@ def evtx():
     """Parse evtx files."""
 
     # CONFIGURE ops
-    gather_evtx = gather_files.alias("gather_evtx")
+    gather_evtx = generate_files.alias("gather_evtx")
 
     zircolite_send_file_configured = send_json_file.configured(
         {"source": "zircolite", "sourcetype": "dino:zircolite/json"},
@@ -66,5 +66,5 @@ def evtx():
     # RUN pipeline
 
     evtx_files = gather_evtx()
-    evtx_files.map(process_zircolite).map(zircolite_send_file_configured)
+    evtx_files.map(process_chainsaw).map(zircolite_send_file_configured)
     evtx_files.map(process_evtx)

@@ -1,0 +1,3 @@
+execution:
+  celery:
+    broker: 'pyamqp://dino:SPKKJxqHIc1OS92raTeo@rabbitmq:5672/dino'
