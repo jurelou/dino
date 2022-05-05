@@ -25,7 +25,6 @@ services:
   splunk:
     <<: *x-common
     container_name: splunk
-    image: dino/splunk
     build:
       context: ./docker/splunk
     environment:
@@ -40,7 +39,6 @@ services:
   dagster-dagit:
     <<: *x-common
     container_name: dagit
-    image: dino/dagster
     build:
       context: .
       dockerfile: ./docker/dagster/dev/Dockerfile
@@ -50,7 +48,6 @@ services:
   dagster-daemon:
     <<: *x-common
     container_name: dagster
-    image: dino/dagster
     build: 
       context: .
       dockerfile: ./docker/dagster/dev/Dockerfile
@@ -63,7 +60,6 @@ services:
 
   worker:
     <<: *x-common
-    image: dino/dagster
     build: 
       context: .
       dockerfile: ./docker/dagster/dev/Dockerfile
